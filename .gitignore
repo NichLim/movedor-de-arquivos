@@ -1,5 +1,5 @@
 #Custom Files
-*.json
+config.json
 *.log
 
 # Byte-compiled / optimized / DLL files
