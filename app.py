@@ -28,16 +28,19 @@ with open('config.json') as config: #extraindo as informações de whitelist, or
     logger.info('Validando Pasta de Destino')
     if os.path.exists(config_from_JSON["destino"]):  #Verifica se o endereço de destino dentro do JSON é um caminho válido no Sistema
         destino = config_from_JSON["destino"]
-        logger.info('Endereço de Destino %s válido', origem)
+        logger.info('Endereço de Destino %s válido', destino)
     else:
-        logger.warning('Origem Inválida. Por favor, verifique o arquivo config.json')
+        logger.warning('Destino Inválido. Por favor, verifique o arquivo config.json')
         logger.error('Um erro foi encontrado durante a execução do programa, por favor verifique o Log')
         sys.exit(0)
 
     logger.info('Verificando Whitelist')
     if isinstance(config_from_JSON["whitelist"], list): #Verifica se a Whitelist é uma Lista Python válida (arrays são resolvidos como Listas quando são importados)
         whitelist = config_from_JSON["whitelist"]
-        logger.info('Whitelist Válida: %s', whitelist)
+        if not whitelist: #Checa se a Whitelist está vazia
+            logger.warning('Whitelist Vazia, isto transferirá todos os arquivos da pasta de origem')
+        else:
+            logger.info('Whitelist Válida: %s', whitelist)
     else:
         logger.warning('Whitelist Inválida. Por favor verifique o arquivo config.json')
         logger.error('Um erro foi encontrado durante a execução do programa, por favor verifique o Log')
@@ -47,11 +50,12 @@ with open('config.json') as config: #extraindo as informações de whitelist, or
 
 arquivos = list(set(os.listdir(origem)) - set(whitelist)) #lista com os arquivos da pasta sem os arquivos da whitelist
 
-if len(arquivos) == 0:  #Checa se há algo para transferir
-    logger.warning('Não há arquivos a serem transferidos')
-
-for a, arquivo in enumerate(arquivos):
+for arquivo in arquivos:
+    if not arquivos or (len(arquivos) == 1 and os.path.join(origem, arquivo) == destino):  #Checa se há algo para transferir e, caso só haja o arquivo de destino para transferir, emite erro e encerra o programa
+        logger.warning('Não há arquivos a serem transferidos')
+        sys.exit(0)
+    if os.path.join(origem, arquivo) == destino: #Prevenção de Transferencia de arquivos para dentro deles mesmos
+        continue
     shutil.move(os.path.join(origem, arquivo), os.path.join(destino, arquivo))
     logger.info('Transferindo %s', arquivo)
-    if a == len(arquivos) - 1 : #Checa se está no último arquivo da lista de arquivos
-        logger.info('Transferencia Completa.')
+    logger.info('Transferencia Completa.')
