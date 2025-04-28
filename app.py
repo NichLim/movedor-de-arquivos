@@ -73,12 +73,17 @@ arquivos = list(
 )  # lista com os arquivos da pasta sem os arquivos da whitelist
 
 for arquivo in arquivos:
-    if (
-        not arquivos
-        or (len(arquivos) == 1 and os.path.join(origem, arquivo) == destino)
-    ):  # Checa se há algo para transferir e, caso só haja o arquivo de destino para transferir, emite erro e encerra o programa
-        logger.warning("Não há arquivos a serem transferidos")
-        sys.exit(0)
-    shutil.move(os.path.join(origem, arquivo), os.path.join(destino, arquivo))
-    logger.info(f"Transferindo {arquivo}")
-    logger.info("Transferencia Completa.")
+    try: 
+        if (
+            not arquivos
+            or (len(arquivos) == 1 and os.path.join(origem, arquivo) == destino)
+        ):  # Checa se há algo para transferir e, caso só haja o arquivo de destino para transferir, emite erro e encerra o programa
+            logger.warning("Não há arquivos a serem transferidos")
+            sys.exit(0)
+        shutil.move(os.path.join(origem, arquivo), os.path.join(destino, arquivo))
+        logger.info(f"Transferindo {arquivo}")
+        logger.info("Transferencia Completa.")
+    except OSError as e:
+            logger.error(
+                f"Falha ao remover {arquivo}. Erro: {e}"
+            )  # Lança o erro no log, caso tenha algum erro
