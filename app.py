@@ -85,5 +85,5 @@ for arquivo in arquivos:
         logger.info("Transferencia Completa.")
     except OSError as e:
             logger.error(
-                f"Falha ao remover {arquivo}. Erro: {e}"
+                f"Falha ao transferir {arquivo}. Erro: {e}"
             )  # Lança o erro no log, caso tenha algum erro
